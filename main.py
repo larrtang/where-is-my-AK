@@ -40,6 +40,7 @@ def main():
         #os.system("pkill chromedriver")
         #os.system("pkill chrome")
         os.system("pkill firefox")
+        os.system("pkill geckodriver")
 
         stock = soup.findAll("li", {"class": "item product product-item"})
         print('---------------------------------------------------------')
@@ -50,7 +51,7 @@ def main():
         for item in stock:
             item_soup = BeautifulSoup(str(item), "lxml")
             item_name = item_soup.find("a", {"class" : "product-item-link"}).text.replace("\n", "").replace("\t","")
-            print(item_name)
+            #print(item_name)
             in_stock = item_soup.find("button", {"title" : "Add to Cart"})
             if in_stock is not None:  # in stock
                 msg += item_name[0:50] + "\n"
