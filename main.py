@@ -9,6 +9,10 @@ from TwilioClient import TwilioClient
 from WebScraper import WebScraper
 import time
 from datetime import datetime
+import logging 
+
+logging.basicConfig(filename="logs.log", filemode="w", level=logging.INFO)
+logger = logging.getLogger("where-is-my-ak")
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'}
 #url = "https://palmettostatearmory.com/ar-15/ar15-guns.html"
@@ -32,7 +36,7 @@ def main():
         #browser = webdriver.Chrome(executable_path="./chromedriver")
         browser = webdriver.Firefox()
         browser.set_window_size(1600, 900) # fu*k reCAPTCHA
-        print(browser.execute_script("return [window.innerWidth, window.innerHeight];"))
+        #logger.info(browser.execute_script("return [window.innerWidth, window.innerHeight];"))
         browser.get(url)
         
         soup = BeautifulSoup(browser.execute_script("return document.body.innerHTML"), "lxml")
@@ -43,8 +47,8 @@ def main():
         os.system("pkill geckodriver")
 
         stock = soup.findAll("li", {"class": "item product product-item"})
-        print('---------------------------------------------------------')
-        print("Number of items=", len(stock))
+        logger.info('---------------------------------------------------------')
+        logger.info("Number of items=" + str(len(stock)))
         msg  = "In Stock Now!\n"
         is_anything_in_stock = False
 
@@ -59,14 +63,14 @@ def main():
         
         now = datetime.now().strftime("%H:%M:%S")
         if is_anything_in_stock:  
-            print(now, msg)
+            logger.info(now + " " + msg)
             twilio.sendMessage(msg)
             #cmd = "echo '"+msg +"'| mail -s 'Get the fuck onto PSA and buy shit' larrtang@gmail.com"
             #print(cmd)
             #os.system(cmd)
             time.sleep(60*15)
         else:               
-            print(now, "Nothing found, sleeping")
+            logger.info(now + " Nothing found, sleeping")
             time.sleep(60)
 
 
