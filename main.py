@@ -31,7 +31,8 @@ def main():
 
     os.environ['webdriver.chrome.driver'] = './chromedriver'
     twilio = TwilioClient()
-
+    items = []
+    
     while (True):
         #browser = webdriver.Chrome(executable_path="./chromedriver")
         browser = webdriver.Firefox()
@@ -51,24 +52,36 @@ def main():
         logger.info("Number of items=" + str(len(stock)))
         msg  = "In Stock Now!\n"
         is_anything_in_stock = False
-
+        current_items = []
         for item in stock:
             item_soup = BeautifulSoup(str(item), "lxml")
             item_name = item_soup.find("a", {"class" : "product-item-link"}).text.replace("\n", "").replace("\t","")
             #print(item_name)
+            
             in_stock = item_soup.find("button", {"title" : "Add to Cart"})
             if in_stock is not None:  # in stock
                 msg += item_name[0:50] + "\n"
                 is_anything_in_stock = True
+                current_items.append(item_name)
         
+        change = False
+        for i in current_items:
+            if i not in items:
+                change = True
+                items = current_items
+
+        if is_anything_in_stock is True and change is False:
+            logger.info("items in stock but no change from last check.")
+        notify = is_anything_in_stock and change
+
         now = datetime.now().strftime("%H:%M:%S")
-        if is_anything_in_stock:  
+        if notify:  
             logger.info(now + " " + msg)
             twilio.sendMessage(msg)
             #cmd = "echo '"+msg +"'| mail -s 'Get the fuck onto PSA and buy shit' larrtang@gmail.com"
-            #print(cmd)
+            #print(msg)
             #os.system(cmd)
-            time.sleep(60*15)
+            time.sleep(60*10)
         else:               
             logger.info(now + " Nothing found, sleeping")
             time.sleep(60)
