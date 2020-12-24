@@ -8,6 +8,7 @@ import os
 from TwilioClient import TwilioClient
 from WebScraper import WebScraper
 import time
+from datetime import datetime
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'}
 url = "https://palmettostatearmory.com/ar-15/ar15-guns.html"
@@ -25,42 +26,46 @@ def set_viewport_size(driver, width, height):
 def main():
 
     os.environ['webdriver.chrome.driver'] = './chromedriver'
-    #twilio = TwilioClient()
+    twilio = TwilioClient()
 
     while (True):
-        browser = webdriver.Chrome(executable_path="./chromedriver")
+        #browser = webdriver.Chrome(executable_path="./chromedriver")
+        browser = webdriver.Firefox()
         browser.set_window_size(1600, 900) # fu*k reCAPTCHA
         print(browser.execute_script("return [window.innerWidth, window.innerHeight];"))
         browser.get(url)
         
         soup = BeautifulSoup(browser.execute_script("return document.body.innerHTML"), "lxml")
         
-        os.system("pkill chromedriver")
-        os.system("pkill chrome")
-        
+        #os.system("pkill chromedriver")
+        #os.system("pkill chrome")
+        os.system("pkill firefox")
+
         stock = soup.findAll("li", {"class": "item product product-item"})
-        print('--------------------------\n\n\n\n\n\n\n--------------------------')
+        print('---------------------------------------------------------')
         print("Number of items=", len(stock))
         msg  = "In Stock Now!\n"
         is_anything_in_stock = False
 
         for item in stock:
             item_soup = BeautifulSoup(str(item), "lxml")
-            item_name = item_soup.find("a", {"class" : "product-item-link"}).text.replace("\n", "")
+            item_name = item_soup.find("a", {"class" : "product-item-link"}).text.replace("\n", "").replace("\t","")
             print(item_name)
             in_stock = item_soup.find("button", {"title" : "Add to Cart"})
-            if in_stock is not None:   # in stock
-                msg += item_name + "\n"
+            if in_stock is not None:  # in stock
+                msg += item_name[0:50] + "\n"
                 is_anything_in_stock = True
-
+        
+        now = datetime.now().strftime("%H:%M:%S")
         if is_anything_in_stock:  
-            print(msg)
-            #twilio.sendMessage(msg)
-            cmd = "echo '"+msg +"'| mail -s 'Get the fuck onto PSA and buy shit' larrtang@gmail.com"
-            print(cmd)
-            os.system(cmd)
+            print(now, msg)
+            twilio.sendMessage(msg)
+            #cmd = "echo '"+msg +"'| mail -s 'Get the fuck onto PSA and buy shit' larrtang@gmail.com"
+            #print(cmd)
+            #os.system(cmd)
             time.sleep(60*15)
-        else:                   
+        else:               
+            print(now, "Nothing found, sleeping")
             time.sleep(60)
 
 
