@@ -11,8 +11,8 @@ import time
 from datetime import datetime
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'}
-url = "https://palmettostatearmory.com/ar-15/ar15-guns.html"
-#url = "https://palmettostatearmory.com/guns/ak-rifles-pistols.html"
+#url = "https://palmettostatearmory.com/ar-15/ar15-guns.html"
+url = "https://palmettostatearmory.com/guns/ak-rifles-pistols.html"
 
 
 def set_viewport_size(driver, width, height):
