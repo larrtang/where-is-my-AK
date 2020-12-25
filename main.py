@@ -87,7 +87,7 @@ def main():
             else:               
                 logger.info(now + " Nothing found, sleeping")
                 time.sleep(60)
-    except Exception e:
+    except Exception as e:
         logger.fatal(str(e))
         sys.exit(-1)
 
