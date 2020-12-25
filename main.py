@@ -48,6 +48,7 @@ def main():
             #os.system("pkill chrome")
             os.system("pkill firefox")
             os.system("pkill geckodriver")
+            os.system("rm -rf /tmp/rust_mozprofile*")
 
             stock = soup.findAll("li", {"class": "item product product-item"})
             logger.info('---------------------------------------------------------')
