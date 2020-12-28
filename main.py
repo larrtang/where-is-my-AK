@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 import logging 
 import sys
-
+import psutil
 
 logging.basicConfig(filename="logs.log", filemode="w", level=logging.INFO)
 logger = logging.getLogger("where-is-my-ak")
@@ -78,15 +78,17 @@ def main():
             notify = is_anything_in_stock and change
 
             now = datetime.now().strftime("%H:%M:%S")
+            mem = str(psutil.virtual_memory().percent)
+
             if notify:  
-                logger.info(now + " " + msg)
+                logger.info("mem=" + mem + "%\t" + now + " " + msg)
                 twilio.sendMessage(msg)
                 #cmd = "echo '"+msg +"'| mail -s 'Get the fuck onto PSA and buy shit' larrtang@gmail.com"
                 #print(msg)
                 #os.system(cmd)
                 time.sleep(60*10)
             else:               
-                logger.info(now + " Nothing found, sleeping")
+                logger.info("mem=" + mem + "%\t" + now + " Nothing found, sleeping")
                 time.sleep(60)
     except Exception as e:
         logger.fatal(str(e))
